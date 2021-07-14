@@ -1,0 +1,15 @@
+#ignore mytest folder
+.to_be_ignored
+
+#ignore objects folder, executable file and output file
+obj/
+exe
+tests/morse
+
+#ignore docs folder (temporary)
+docs/
+
+#ignore valgrind core faults(?)
+vgcore.*
+
+
