@@ -1,18 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>      //used for tolower() function
+#include <ctype.h>      // tolower() function
 
 #include "conversion.h"
 
-void append_to_morse_file(FILE *dest, const char input)
-{
-    char ch_morse[7];
-    to_morse(ch_morse, input);
-    fprintf(dest, "%s", ch_morse);
-    //printf("%s", ch_morse);
-}
 
+/*------------------------------------------------------- *
+* Check if the given char can be converted to morse
+* ------------------------------------------------------- */
 int is_morseable(const char input)
 {
     return (input >= '0' && input <= '9') ||
@@ -20,8 +16,10 @@ int is_morseable(const char input)
            (input >= 'a' && input <= 'z');
 }
 
-/*--------------------------*/
-// appends to the given string the morse equivalent of input
+
+/*------------------------------------------------------- *
+* Appends to the given string the morse equivalent of input
+* ------------------------------------------------------- */
 void to_morse(char *string, const char input)
 {
     if (strncmp(&input, NEWLINE, 1))
@@ -80,57 +78,4 @@ void to_morse(char *string, const char input)
         }
     }
     return;
-}
-
-
-void print_fun(FILE *source, FILE *destination)
-{
-    char ch_curr = fgetc(source), ch_next;
-    int initial_whitespace = TRUE;
-
-    while (!feof(source))
-    {
-        ch_next = fgetc(source);
-        printf("'%c' '%c'\n", ch_curr, ch_next);
-        // check next char isn't EOF so we can continue
-        if (!feof(source))
-        {
-        printf("serterte'%c' '%c'\n", ch_curr, ch_next);
-            append_to_morse_file(destination, ch_curr);
-            break;
-        }
-
-        // skip if: char not morseable or space+space or
-        //          space+newline or newline+newline
-        if (!is_morseable(ch_curr) ||
-
-            strncmp(&ch_curr, SPACE, sizeof(SPACE)) &&
-            strncmp(&ch_next, NEWLINE, sizeof(NEWLINE)) ||
-
-            strncmp(&ch_curr, SPACE, sizeof(SPACE)) &&
-            strncmp(&ch_next, SPACE, sizeof(SPACE)) ||
-
-            strncmp(&ch_curr, NEWLINE, sizeof(NEWLINE)) &&
-            strncmp(&ch_next, NEWLINE, sizeof(NEWLINE))
-            )
-        {
-            ch_curr = ch_next;
-            continue;
-        }
-        if ((strncmp(&ch_curr, SPACE, sizeof(SPACE)) ||
-             strncmp(&ch_curr, NEWLINE, sizeof(NEWLINE))) &&
-             is_morseable(ch_next) &&
-             initial_whitespace
-            )
-        {
-            // ch_next is the first morseable char
-            initial_whitespace = FALSE;
-
-            ch_curr = ch_next;
-            continue;
-        }
-        printf("'%c' '%c'\n", ch_curr, ch_next);
-
-        append_to_morse_file(destination, ch_curr);
-    }
 }
