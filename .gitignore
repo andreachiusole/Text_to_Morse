@@ -9,7 +9,10 @@ tests/morse
 #ignore docs folder (temporary)
 docs/
 
-#ignore valgrind core faults(?)
+#ignoring the test folder already uploaded
+tests/
+
+#ignore valgrind core files
 vgcore.*
 
 
