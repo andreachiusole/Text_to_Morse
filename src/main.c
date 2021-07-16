@@ -22,23 +22,14 @@
 
 #include "conversion.h"
 
-#define INPUT   "./tests/test"
+#define INPUT   "./tests/text"
 #define OUTPUT  "./tests/morse"
 
 
 int main(int argc, char *argv[])
 {
     FILE *source, *destination;
-    /*char *space = " ";
 
-    printf("asci: %d %d %d %d %d %d %d %d\n\n\n", '0', '9', 'a', 'z', 'A', 'Z', ' ', '\n');
-
-
-    printf("is morseable: %d\n", is_morseable(' '));
-    printf("is strcmp space: %d\n", strncmp(" ", SPACE, sizeof(SPACE)));
-    printf("is space: %d\n", !strncmp(" ", SPACE, sizeof(SPACE)));
-    printf("is space: %d\n", is_space(" "));
-    */
     source = fopen(INPUT, "r");
     if (source == NULL)
     {
@@ -52,7 +43,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    printf_morse(source, destination);
+    print_morse(source, destination);
 
     printf("End of file reached successfully.\n");
     fclose(source);
