@@ -4,63 +4,70 @@
 
 #include "conversion.h"
 
-void append_to_morse_file(FILE *dest, const char input)
+void append_to_morse_file(FILE *dest, const char input, char *temp)
 {
-    char ch_morse[7];
+    char ch_morse[7] = "\0";
     to_morse(ch_morse, input);
     fprintf(dest, "%s", ch_morse);
-    printf("%s", ch_morse);
+    //printf("morse: '%c' = '%s'\n", input, ch_morse);
+    strcat(temp, ch_morse);
 }
 
 
-void print_fun(FILE *source, FILE *destination)
+void print_morse(FILE *source, FILE *destination)
 {
     char ch_curr = fgetc(source), ch_next;
     int initial_whitespace = TRUE;
-
+    char temp[1000] = "\0";
     while (!feof(source))
     {
         ch_next = fgetc(source);
-        printf("'%c' '%c'\n", ch_curr, ch_next);
         // check next char isn't EOF so we can continue
         if (feof(source))
         {
-            printf("serterte'%c' '%c'\n", ch_curr, ch_next);
-            append_to_morse_file(destination, ch_curr);
+            printf("final charachter: '%c' '%c'\n", ch_curr, ch_next);
+            append_to_morse_file(destination, ch_curr, temp);
             break;
         }
 
-        // skip if: char not morseable or space+space or
-        //          space+newline or newline+newline
-        if (!is_morseable(ch_curr) ||
+        printf("curr:'%c' next:'%c'\n", ch_curr, ch_next);
 
-            strncmp(&ch_curr, SPACE, sizeof(SPACE)) &&
-            strncmp(&ch_next, NEWLINE, sizeof(NEWLINE)) ||
-
-            strncmp(&ch_curr, SPACE, sizeof(SPACE)) &&
-            strncmp(&ch_next, SPACE, sizeof(SPACE)) ||
-
-            strncmp(&ch_curr, NEWLINE, sizeof(NEWLINE)) &&
-            strncmp(&ch_next, NEWLINE, sizeof(NEWLINE))
-            )
-        {
-            ch_curr = ch_next;
-            continue;
-        }
-        if ((strncmp(&ch_curr, SPACE, sizeof(SPACE)) ||
-             strncmp(&ch_curr, NEWLINE, sizeof(NEWLINE))) &&
-             is_morseable(ch_next) &&
+        /* skip whitespace if before the first char */
+        if ((is_space(ch_curr) || is_newline(ch_curr)) &&
              initial_whitespace
             )
         {
-            // ch_next is the first morseable char
-            initial_whitespace = FALSE;
+            /* check if ch_next is the first morseable char */
+            if (is_morseable(ch_next))
+            {
+                initial_whitespace = FALSE;
+            }
+            printf("whitespace skipped\n");
 
             ch_curr = ch_next;
             continue;
         }
-        printf("'%c' '%c'\n", ch_curr, ch_next);
 
-        append_to_morse_file(destination, ch_curr);
+        // skip duplicates: space+space or space+newline
+        //                  or newline+newline
+        if (is_space(ch_curr)   && is_newline(ch_next) ||
+            is_space(ch_curr)   && is_space(ch_next) ||
+            is_newline(ch_curr) && is_newline(ch_next)
+            )
+        {
+            printf("\tskipped one blank char\n");
+            ch_curr = ch_next;
+            continue;
+        }
+
+        if (is_newline(ch_curr) && is_space(ch_next))
+        {
+            initial_whitespace = TRUE;
+        }
+
+        append_to_morse_file(destination, ch_curr, temp);
+        ch_curr = ch_next;
     }
+
+    printf("char temp: '%s'\n", temp);
 }
