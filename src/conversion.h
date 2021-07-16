@@ -14,8 +14,5 @@
 void print_morse(FILE *source, FILE *destination);
 void to_morse(char *string, const char input);
 int is_morseable(const char input);
-int is_space(const char c);
-int is_newline(const char c);
-
 
 #endif

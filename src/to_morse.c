@@ -5,25 +5,9 @@
 
 #include "conversion.h"
 
-
-/* strncmp returns 0 (FALSE) when strings are equal */
-int is_space(const char c)
-{
-    // return !strncmp(str, SPACE, sizeof(SPACE));
-    return c == SPACE;
-}
-
-int is_newline(const char c)
-{
-    //return !strncmp(str, NEWLINE, sizeof(NEWLINE));
-    return c == NEWLINE;
-}
-
-
-
 /*------------------------------------------------------- *
-* Check if the given char can be converted to morse
-* or is either a space or a new line
+* Check if the given char can be converted to morse       *
+* or is either a space or a new line.                     *
 * ------------------------------------------------------- */
 int is_morseable(const char input)
 {
@@ -34,11 +18,12 @@ int is_morseable(const char input)
 
 
 /*------------------------------------------------------- *
-* Appends to the given string the morse equivalent of input
+* Appends to the given string the morse equivalent of     *
+* input.                                                  *
 * ------------------------------------------------------- */
 void to_morse(char *string, const char input)
 {
-    if (is_newline(input))
+    if (input == NEWLINE)
     {
         strcat(string, "\n");
         return;
@@ -93,5 +78,4 @@ void to_morse(char *string, const char input)
             case '0':   strcat(string, "-----");  break;
         }
     }
-    return;
 }
