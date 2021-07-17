@@ -44,7 +44,14 @@ void print_morse(FILE *source, FILE *destination)
         if (feof(source))
         {
             append_to_morse_file(destination, ch_curr, !word_finished);
+            printf("\nEnd of file reached successfully.\n");
             break;
+        }
+
+        // Tabs are converted into spaces
+        if (ch_next == '\t')
+        {
+            ch_next = ' ';
         }
 
         // Skip non morseable char until a morsable one is reached
