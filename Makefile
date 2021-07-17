@@ -13,6 +13,7 @@ OBJECTS	= $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
 
 exe: $(OBJECTS)
 	$(CC) -o $@ $^ $(CFLAGS)
+	@echo -e "\n\tEverything compiled successfully!\n"
 
 test: exe
 	@./$<
@@ -28,7 +29,7 @@ output_clean:
 	$(RM) ./out/morse.txt
 
 clean: output_clean
-	$(RM) -r ./obj
+	$(RM) -r $(OBJDIR) $(OUTDIR)
 	$(RM) exe
 
 # #credits
