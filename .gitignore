@@ -4,7 +4,7 @@
 #ignore objects folder, executable file and output file
 obj/
 exe
-tests/morse
+out/
 
 #ignore docs folder (temporary)
 docs/

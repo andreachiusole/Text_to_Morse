@@ -5,6 +5,7 @@ CFLAGS	= -I. -g
 
 SRCDIR	= src
 OBJDIR	= obj
+OUTDIR  = out
 
 SOURCES	= $(wildcard $(SRCDIR)/*.c)
 DEPS	= $(wildcard $(SRCDIR)/*.h)
@@ -17,14 +18,14 @@ test: exe
 	@./$<
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(DEPS)
-	@mkdir -p $(OBJDIR)
+	@mkdir -p $(OBJDIR) $(OUTDIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 	@echo -e "\tCompiled "$<" successfully!"
 
 .PHONY: clean output_clean
 
 output_clean:
-	$(RM) ./tests/morse
+	$(RM) ./out/morse.txt
 
 clean: output_clean
 	$(RM) -r ./obj
