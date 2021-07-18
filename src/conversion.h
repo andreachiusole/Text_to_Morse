@@ -11,8 +11,11 @@
 #define NOCHAR      "\0"
 
 
-void print_morse(FILE *source, FILE *destination);
-void to_morse(char *string, const char input);
+void print_morse(FILE *source, FILE *destination,
+				 const char *ch_sep, const char *wd_sep);
+
+void to_morse(char *string, const char *wd_sep, const char input);
+
 int is_morseable(const char input);
 
 #endif
