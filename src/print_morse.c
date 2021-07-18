@@ -5,19 +5,21 @@
 
 /*------------------------------------------------------- *
 * Print at dest the result of the translation of input    *
-* into morse code. The parameter char_sep is used to add  *
-* the separator between letters before translating.       *
+* into morse code. The parameter separator_flag is used   *
+* to add the separator between letters before translating.*
 * ------------------------------------------------------- */
-void append_to_morse_file(FILE *dest, const char input, int char_sep)
+void append_to_morse_file(FILE *dest, const char input,
+                          const int separator_flag,
+                          const char *ch_sep, const char *wd_sep)
 {
-    char ch_morse[7] = "\0";
+    char ch_morse[20] = "\0";
 
     // Concatenate the separator between chars
-    if (char_sep)
+    if (separator_flag)
     {
-        strcat(ch_morse, CHARSEP);
+        strcat(ch_morse, ch_sep);
     }
-    to_morse(ch_morse, input);
+    to_morse(ch_morse, wd_sep, input);
 
     fprintf(dest, "%s", ch_morse);
 }
@@ -31,7 +33,8 @@ void append_to_morse_file(FILE *dest, const char input, int char_sep)
 * The values of the flags initial_whitespace and          *
 * word_finished are updated at the end of every cycle.    *
 * ------------------------------------------------------- */
-void print_morse(FILE *source, FILE *destination)
+void print_morse(FILE *source, FILE *destination,
+                 const char *ch_sep, const char *wd_sep)
 {
     char ch_curr = fgetc(source), ch_next;
     int initial_whitespace = TRUE;
@@ -43,8 +46,9 @@ void print_morse(FILE *source, FILE *destination)
         // Check if next char is EOF to print last char
         if (feof(source))
         {
-            append_to_morse_file(destination, ch_curr, !word_finished);
-            printf("\nEnd of file reached successfully.\n");
+            append_to_morse_file(destination, ch_curr,
+                                 !word_finished, ch_sep, wd_sep);
+            printf("\n\tEnd of file reached successfully.\n");
             break;
         }
 
@@ -88,7 +92,8 @@ void print_morse(FILE *source, FILE *destination)
             continue;
         }
 
-        append_to_morse_file(destination, ch_curr, !word_finished);
+        append_to_morse_file(destination, ch_curr,
+                             !word_finished, ch_sep, wd_sep);
 
         // Update flag for initial whitespace.
         // The checks done to skip duplicates prevent from having
