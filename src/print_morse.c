@@ -8,20 +8,29 @@
 * into morse code. The parameter separator_flag is used   *
 * to add the separator between letters before translating.*
 * ------------------------------------------------------- */
-void append_to_morse_file(FILE *dest, const char input,
-                          const int separator_flag,
-                          const char *ch_sep, const char *wd_sep)
+static void append_to_morse_file(FILE *dest, const char input,
+                                 const int separator_flag,
+                                 const int is_there_output_file,
+                                 const char *ch_sep, const char *wd_sep)
 {
     char ch_morse[20] = "\0";
 
-    // Concatenate the separator between chars
+    /* Concatenate the separator between chars */
     if (separator_flag)
     {
         strcat(ch_morse, ch_sep);
     }
+
     to_morse(ch_morse, wd_sep, input);
 
-    fprintf(dest, "%s", ch_morse);
+    if (is_there_output_file)
+    {
+        fprintf(dest, "%s", ch_morse);
+    }
+    else
+    {
+        printf("%s", ch_morse);
+    }
 }
 
 
@@ -34,6 +43,7 @@ void append_to_morse_file(FILE *dest, const char input,
 * word_finished are updated at the end of every cycle.    *
 * ------------------------------------------------------- */
 void print_morse(FILE *source, FILE *destination,
+                 int is_there_output_file,
                  const char *ch_sep, const char *wd_sep)
 {
     char ch_curr = fgetc(source), ch_next;
@@ -43,22 +53,24 @@ void print_morse(FILE *source, FILE *destination,
     while (!feof(source))
     {
         ch_next = fgetc(source);
-        // Check if next char is EOF to print last char
+        /* Check if next char is EOF to print last char */
         if (feof(source))
         {
             append_to_morse_file(destination, ch_curr,
-                                 !word_finished, ch_sep, wd_sep);
-            printf("\n\tEnd of file reached successfully.\n");
+                                 !word_finished, is_there_output_file,
+                                 ch_sep, wd_sep);
+            if (is_there_output_file)
+                printf("\n\tEnd of file reached.\n");
             break;
         }
 
-        // Tabs are converted into spaces
+        /* Tabs are converted into spaces */
         if (ch_next == '\t')
         {
             ch_next = ' ';
         }
 
-        // Skip non morseable char until a morsable one is reached
+        /* Skip non morseable char until a morsable one is reached */
         if (!(is_morseable(ch_next) ||
               ch_next == SPACE ||
               ch_next == NEWLINE)
@@ -67,22 +79,23 @@ void print_morse(FILE *source, FILE *destination,
             continue;
         }
 
-        // Skip whitespaces before the first char
+        /* Check if ch_curr is the first char */
+        if (is_morseable(ch_curr) && initial_whitespace == TRUE)
+        {
+            initial_whitespace = FALSE;
+        }
+        else
+        /* Skip whitespaces before the first char */
         if ((ch_curr == SPACE || ch_curr == NEWLINE) &&
              initial_whitespace
             )
         {
-            // Check if ch_next is the first char
-            if (is_morseable(ch_next))
-            {
-                initial_whitespace = FALSE;
-            }
             ch_curr = ch_next;
             continue;
         }
 
-        // Skip: duplicates (space+space or newline+newline)
-        //       and space before space+newline
+        /* Skip: duplicates (space+space or newline+newline)
+                 and space before space+newline */
         if ((ch_curr == SPACE)   && (ch_next == SPACE) ||
             (ch_curr == NEWLINE) && (ch_next == NEWLINE) ||
             (ch_curr == SPACE)   && (ch_next == NEWLINE)
@@ -93,17 +106,16 @@ void print_morse(FILE *source, FILE *destination,
         }
 
         append_to_morse_file(destination, ch_curr,
-                             !word_finished, ch_sep, wd_sep);
+                             !word_finished, is_there_output_file,
+                             ch_sep, wd_sep);
 
-        // Update flag for initial whitespace.
-        // The checks done to skip duplicates prevent from having
-        // other scenarios
-        if ((ch_curr == NEWLINE) && (ch_next == SPACE))
+        /* Update flag for initial whitespace */
+        if (ch_curr == NEWLINE)
         {
             initial_whitespace = TRUE;
         }
 
-        //Update flag for word end reached.
+        /* Update flag for word end reached */
         if (is_morseable(ch_curr) &&
             (ch_next == SPACE || ch_next == NEWLINE))
         {
