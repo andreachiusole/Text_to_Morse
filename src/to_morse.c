@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>      // tolower() function
+#include <ctype.h>      /* tolower() function */
 
 #include "conversion.h"
 
@@ -97,7 +97,7 @@ void to_morse(char *string, const char *wd_sep, const char input)
             case '@':   strcat(string, ".--.-.");  break;
             case '!':   strcat(string, "-.-.--");  break;
 
-            default: // input is not a morseable char
+            default: /* input is not a morseable char */
                 break;
         }
     }
