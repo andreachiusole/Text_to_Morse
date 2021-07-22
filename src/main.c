@@ -1,95 +1,130 @@
 #include <stdio.h>
-#include <stdlib.h>     // # define EXIT_FAILURE 1
+#include <stdlib.h>     /* # define EXIT_FAILURE 1 */
 #include <string.h>
+#include <getopt.h>
 
 #include "conversion.h"
 
-#define INPUT   "./tests/text"
-#define OUTPUT  "./out/morse.txt"
+/*
+struct option {
+    const char *name; // long version option name
+    int has_args;
+    int *flag;
+    int val;
+};
+*/
 
-
-void start()
+void help()
 {
-    printf("\n\t                             TEXT TO MORSE\n");
-    printf("\n\t     The scope of this program is to convert text into Morse code.\n");
-    printf("\n\t If you want to convert a text file of yours you have to place it in the");
-    printf("\n\t           project folder and afterwards type here its name.\n");
-    printf("\n\t  The name should be less than 31 characters including the extension.\n");
-    printf("\n\t  A default text file is already present inside the project directory\n\n");
+    printf("Usage: ./morse FILE [OPTION]...\n");
+    printf("    Encode FILE in morse code.\n\n");
+    printf("    Options:\n");
+    printf("      -o, --output DEST     set DEST as the output file where to save the \n");
+    printf("                              encoded text\n");
+    printf("      -c, --char-sep SEP    use SEP as separator between characters [default:' ']\n");
+    printf("      -w, --word-sep SEP    use SEP as separator between words     [default:'//']\n");
+    printf("      -h, --help            show usage\n");
 }
-
-/*------------------------------------------------------- *
-* Get source address                                      *
-* ------------------------------------------------------- */
-void get_source_address(char *source_address)
-{
-    printf("\n\tWhat is the name of the file? [Max 999 chars]");
-    printf("\n\t   >>> ");
-
-    if (fgets(source_address, 999, stdin) != NULL)
-    {
-        // Strip the newline char if present
-        source_address[strcspn(source_address, "\n")] = '\0';
-    }
-
-    if (strcmp(source_address, NOCHAR) == 0) strcpy(source_address, INPUT);
-    printf("\tFile to be converted is:     '%s'\n", source_address);
-
-}
-
-/*------------------------------------------------------- *
-* Get separators for chars and words                      *
-* ------------------------------------------------------- */
-void get_separators(char *ch_sep, char *wd_sep)
-{
-    printf("\n\tWhat separator do you want between characters? [Max 9 chars]");
-    printf("\n\t   >>> ");
-
-    if (fgets(ch_sep, 9, stdin) != NULL) ch_sep[strcspn(ch_sep, "\n")] = '\0';
-
-    if (strcmp(ch_sep, NOCHAR) == 0) strcpy(ch_sep, CHARSEP);
-    printf("\tChars will be separated by:  '%s'\n", ch_sep);
-
-
-    printf("\n\tWhat separator do you want between words? [Max 9 chars]");
-    printf("\n\t   >>> ");
-
-    if (fgets(wd_sep, 9, stdin) != NULL) wd_sep[strcspn(wd_sep, "\n")] = '\0';
-
-    if (strcmp(wd_sep, NOCHAR) == 0) strcpy(wd_sep, WORDSEP);
-    printf("\tWords will be separated by:  '%s'\n", wd_sep);
-}
-
 
 int main(int argc, char *argv[])
 {
-    char source_name[1000];
-    char char_separator[10];
-    char word_separator[10];
+    int help_flag = FALSE;
+    int err_flag  = FALSE;
+    char *output_name = NULL;
+    char *char_separator = CHARSEP;
+    char *word_separator = WORDSEP;
+    int c;
+
     FILE *source, *destination;
 
-    start();
-    get_source_address(source_name);
-
-
-    source = fopen(source_name, "r");
-    if (source == NULL)
+    static struct option long_options[] =
     {
-        perror("Error opening source file");
+        {"output",      required_argument, 0, 'o'},
+        {"char-sep",    required_argument, 0, 'c'},
+        {"word-sep",    required_argument, 0, 'w'},
+        {"help",        no_argument,       0, 'h'},
+        {0, 0, 0, 0}
+    };
+
+    while ((c = getopt_long(argc, argv, ":ho:c:w:", long_options, NULL)) != -1)
+    {
+        switch (c)
+        {
+            case 'o': output_name    = optarg;  break;
+            case 'c': char_separator = optarg;  break;
+            case 'w': word_separator = optarg;  break;
+            case 'h': help_flag = TRUE;         break;
+
+            case ':': /* missing option argument */
+                fprintf(stderr, "%s: option '-%c' requires an argument\n", argv[0], optopt);
+                err_flag = TRUE;
+                break;
+            case '?': /* invalid option */
+                fprintf(stderr, "%s: option '-%c' is invalid: ignored\n", argv[0], optopt);
+                err_flag = TRUE;
+                break;
+        }
+    }
+
+    if (help_flag == TRUE || err_flag == TRUE)
+    {
+        help();
+        if (help_flag == TRUE)
+            exit(EXIT_SUCCESS);
+        else
+            exit(EXIT_FAILURE);
+    }
+
+    /* Check if source file has been passed correctly */
+    if (argc == optind)
+    {
+        fprintf(stderr, "%s: source file missing\n", argv[0]);
+        exit(EXIT_FAILURE);
+
+    }
+
+    if ((argc - optind) > 1)
+    {
+        fprintf(stderr, "%s: too many arguments: ", argv[0]);
+
+        while (optind < argc)
+            {
+                fprintf(stderr, "'%s' ", argv[optind++]);
+            }
+        fputc('\n', stderr);
+
         exit(EXIT_FAILURE);
     }
 
-    destination = fopen(OUTPUT, "w+");
-    if (destination == NULL) {
-        perror("Error opening destination file");
-        exit(EXIT_FAILURE);
+    if ((argc - optind) == 1)
+    {
+        source = fopen(argv[optind], "r");
+        if (source == NULL)
+        {
+            perror("Error opening source file");
+            exit(EXIT_FAILURE);
+        }
     }
 
-    get_separators(char_separator, word_separator);
+    /* Check if destination file has been passed */
+    if (output_name != NULL)
+    {
+        destination = fopen(output_name, "w+");
+        if (destination == NULL) {
+            perror("Error opening destination file");
+            exit(EXIT_FAILURE);
+        }
+        print_morse(source, destination, TRUE, char_separator, word_separator);
+        fclose(destination);
+    }
+    else
+    {
+        printf("\t Encoding of file: '%s'\n\n", argv[optind]);
+        print_morse(source, NULL, FALSE, char_separator, word_separator);
+        printf("\n\tEnd of file reached.\n");
+    }
 
-    print_morse(source, destination, char_separator, word_separator);
 
     fclose(source);
-    fclose(destination);
     return 0;
 }
