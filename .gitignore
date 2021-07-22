@@ -1,13 +1,9 @@
 #ignore objects folder, executable file and output file
 obj/
-exe
-out/
+morse
 
 #ignore docs folder (temporary)
 docs/
-
-#ignoring the test folder already uploaded
-tests/
 
 #ignore valgrind core files
 vgcore.*
