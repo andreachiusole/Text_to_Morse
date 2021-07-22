@@ -12,7 +12,8 @@
 
 
 void print_morse(FILE *source, FILE *destination,
-				 const char *ch_sep, const char *wd_sep);
+                 int is_there_output_file,
+                 const char *ch_sep, const char *wd_sep);
 
 void to_morse(char *string, const char *wd_sep, const char input);
 
