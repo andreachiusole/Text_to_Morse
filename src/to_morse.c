@@ -17,7 +17,7 @@ int is_morseable(const char input)
            (input == ':') || (input == '?') ||
            (input == '=') || (input == '-') ||
            (input == '(') || (input == ')') ||
-           (input == '"') || (input == '\'') ||
+           (input == '\"') || (input == '\'') ||
            (input == '/') || (input == '@') ||
            (input == '!');
 }
@@ -91,7 +91,7 @@ void to_morse(char *string, const char *wd_sep, const char input)
             case '-':   strcat(string, "-....-");  break;
             case '(':   strcat(string, "-.--.");   break;
             case ')':   strcat(string, "-.--.-");  break;
-            case '"':   strcat(string, ".-..-.");  break;
+            case '\"':  strcat(string, ".-..-.");  break;
             case '\'':  strcat(string, ".----.");  break;
             case '/':   strcat(string, "-..-.");   break;
             case '@':   strcat(string, ".--.-.");  break;
