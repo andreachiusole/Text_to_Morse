@@ -1,37 +1,44 @@
 # -*- Makefile -*-
-CC		= gcc
-CFLAGS	= -I. -g
+CC      = gcc
+CFLAGS  = -I. -g -std=c89
 
 
-SRCDIR	= src
-OBJDIR	= obj
-OUTDIR  = out
+SRCDIR    = src
+OBJDIR    = obj
 
-SOURCES	= $(wildcard $(SRCDIR)/*.c)
-DEPS	= $(wildcard $(SRCDIR)/*.h)
-OBJECTS	= $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.o, $(SOURCES))
+SOURCES   = $(wildcard $(SRCDIR)/*.c)
+DEPS      = $(wildcard $(SRCDIR)/*.h)
+OBJECTS   = $(patsubst $(SRCDIR)/%.c,$(OBJDIR)/%.o,$(SOURCES))
 
-exe: $(OBJECTS)
-	$(CC) -o $@ $^ $(CFLAGS)
-	@echo -e "\n\tEverything compiled successfully!\n"
+TESTUNITS = $(wildcard tests/units/*)
 
-test: exe
-	@./$<
+morse: $(OBJECTS)
+	@$(CC) -o $@ $^ $(CFLAGS)
+	@echo -e "\n\tEverything compiled successfully\n"
 
 $(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.c $(DEPS)
-	@mkdir -p $(OBJDIR) $(OUTDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
-	@echo -e "\tCompiled "$<" successfully!"
+	@mkdir -p $(OBJDIR)
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo -e "  Compiled "$<""
 
-.PHONY: clean output_clean
+# Target to run tests
 
-output_clean:
-	$(RM) ./out/morse.txt
+test: $(TESTUNITS)
+	@$(RM) tmpfile
 
-clean: output_clean
-	$(RM) -r $(OBJDIR) $(OUTDIR)
-	$(RM) exe
+$(TESTUNITS): morse
+	@./$< $@ -o tmpfile
+	@diff -q tmpfile $(patsubst tests/units/%,tests/checks/%_check,$@) && \
+		echo -e "  $(patsubst tests/units/%,%,$@): test passed"
+
+
+.PHONY: clean
+
+clean:
+	$(RM) -r $(OBJDIR)
+	$(RM) morse
+	@$(RM) tmpfile
 
 # #credits
-# https://cs.colby.edu/maxwell/courses/tutorials/maketutor/
 # https://www.gnu.org/software/make/manual/make.html#Text-Functions
+# https://cs.colby.edu/maxwell/courses/tutorials/maketutor/
