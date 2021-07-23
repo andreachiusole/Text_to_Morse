@@ -119,9 +119,9 @@ int main(int argc, char *argv[])
     }
     else
     {
-        printf("\t Encoding of file: '%s'\n\n", argv[optind]);
+        printf("   Encoding of file: '%s'\n\n", argv[optind]);
         print_morse(source, NULL, FALSE, char_separator, word_separator);
-        printf("\n\tEnd of file reached.\n");
+        printf("\n   End of file reached.\n");
     }
 
 
