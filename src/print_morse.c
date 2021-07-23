@@ -50,17 +50,22 @@ void print_morse(FILE *source, FILE *destination,
     int initial_whitespace = TRUE;
     int word_finished = TRUE;
 
+    /* Check if first char is tab, if yes convert to space */
+    if (ch_curr == '\t')
+    {
+        ch_curr = ' ';
+    }
+
     while (!feof(source))
     {
         ch_next = fgetc(source);
+
         /* Check if next char is EOF to print last char */
         if (feof(source))
         {
             append_to_morse_file(destination, ch_curr,
                                  !word_finished, is_there_output_file,
                                  ch_sep, wd_sep);
-            if (is_there_output_file)
-                printf("\n\tEnd of file reached.\n");
             break;
         }
 
